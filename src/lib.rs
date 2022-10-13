@@ -153,7 +153,7 @@ impl FuzzySet {
         for (index, score) in matches {
             results.push((
                 score as f64 / (vector_normal * items[index].0),
-                items[index].1.clone(),
+                &items[index].1,
             ));
         }
         results.sort_by(|a, b| b.0.total_cmp(&a.0));
@@ -161,7 +161,7 @@ impl FuzzySet {
             ComparisonAlgorithm::Levenshtein => {
                 // Arbitrary truncation
                 for res in results.iter_mut() {
-                    *res = (distance(&res.1, &normalized), res.1.clone());
+                    *res = (distance(&res.1, &normalized), res.1);
                 }
                 results.sort_by(|a, b| b.0.total_cmp(&a.0));
             }
@@ -173,7 +173,7 @@ impl FuzzySet {
                 .iter()
                 .filter_map(|r| {
                     if r.0 >= min_match {
-                        return Some((r.0, self.exact.get(&r.1).unwrap().to_owned()));
+                        return Some((r.0, self.exact.get(r.1).unwrap().to_owned()));
                     }
                     None
                 })
