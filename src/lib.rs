@@ -82,7 +82,7 @@ fn normalize_string(str: &str) -> String {
 
 pub enum ComparisonAlgorithm {
     Levenshtein,
-    Other,
+    Cosine,
 }
 
 pub struct FuzzySet {
@@ -165,7 +165,7 @@ impl FuzzySet {
                 }
                 results.sort_by(|a, b| b.0.total_cmp(&a.0));
             }
-            _ => {}
+            ComparisonAlgorithm::Cosine => {}
         }
 
         Some(
@@ -271,12 +271,22 @@ mod tests {
     }
 
     #[test]
-    fn fzy_set_multipl() {
+    fn fzy_set_multiple() {
         let mut set = FuzzySet::new(2, 4, ComparisonAlgorithm::Levenshtein);
         set.insert("michael axiak");
         set.insert("michael aziak");
         let results = set.get("micael asiak", 0.0).unwrap();
         assert_eq!(results[0].0, 0.8461538461538461);
         assert_eq!(results[1].0, 0.8461538461538461);
+    }
+
+    #[test]
+    fn fzy_set_multiple_cosine() {
+        let mut set = FuzzySet::new(2, 3, ComparisonAlgorithm::Cosine);
+        set.insert("michael axiak");
+        set.insert("michael aziak");
+        let results = set.get("micael asiak", 0.0).unwrap();
+        assert_eq!(results[0].0, 0.5604485383178051);
+        assert_eq!(results[1].0, 0.5604485383178051);
     }
 }
